@@ -1,0 +1,32 @@
+import json
+import urllib
+
+def lambda_handler(event, context):
+    reply_token = event['events'][0]['replyToken']
+    inText = event['events'][0]['message']['text']
+    outText = "hello"
+    return post_text(reply_token, inText, outText)
+
+
+REPLY_ENDPOINT = 'https://api.line.me/v2/bot/message/reply'
+
+def post_text(reply_token, inText, outText):
+    header = {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer {...ADD-YOUR-ACCESS-TOKEY-HERE.....}"
+    }
+    payload = {
+          "replyToken":reply_token,
+          "messages":[
+                {
+                    "type":"text",
+                    "text": "什么" + inText
+                }
+            ]
+    }
+    req = urllib.request.Request(REPLY_ENDPOINT, headers=header)
+    payload = bytes(json.dumps(payload), encoding="utf-8")
+    try:
+        res = urllib.request.urlopen(req, data=payload)
+    except urllib.error.HTTPError as e:
+        print(str(e) + " inText=" + inText + " payload=" + str(payload))
